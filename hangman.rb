@@ -132,15 +132,6 @@ def difficulty_choice(difficulty)
   choice_array
 end
 
-def was_not_picked(c,picked)
-  was_picked = false
-  picked.each do |letter|
-    if letter == c
-      was_picked = true
-    end
-  end
-  return was_picked
-end
 
 def valid_entry(c)
   case c
