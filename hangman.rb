@@ -3,6 +3,7 @@ require "json"
 class PlayRound
 
   def initialize(word, load_game)
+    @hung_man = ["|", "O", "|", "/","\\", "/", "\\"]
     if load_game == true
       self.load
     else
@@ -12,8 +13,6 @@ class PlayRound
       @wrong = 0
       @picked = []
       @man = Array.new(7, " ")
-      @hung_man = ["|", "O", "|", "/","\\", "/", "\\"]
-      puts "Iniitialized!"
     end
   end
 
@@ -218,11 +217,12 @@ def load_game
   valid_selection = false
   while valid_selection == false
     puts "Would you like to load the previous game?"
-    if gets.downcase.chr == "y"
+    choice = gets.downcase.chr
+    if choice == "y"
       valid_selection = true
       return true
-    elsif gets.downcase.chr == "n"
-      valid_selection = true
+    elsif choice == "n"
+      valid_selection = false
       return false
     end
   end
