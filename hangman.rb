@@ -80,6 +80,64 @@ def was_picked(c, picked)
   return was_picked
 end
 
+def valid_entry(c)
+  case c
+  when "a"
+    return true
+  when "b"
+    return true
+  when "c"
+    return true
+  when "d"
+    return true
+  when "e"
+    return true
+  when "f"
+    return true
+  when "g"
+    return true
+  when "h"
+    return true
+  when "i"
+    return true
+  when "j"
+    return true
+  when "k"
+    return true
+  when "l"
+    return true
+  when "m"
+    return true
+  when "n"
+    return true
+  when "o"
+    return true
+  when "p"
+    return true
+  when "q"
+    return true
+  when "r"
+    return true
+  when "s"
+    return true
+  when "t"
+    return true
+  when "u"
+    return true
+  when "v"
+    return true
+  when "w"
+    return true
+  when "x"
+    return true
+  when "y"
+    return true
+  when "z"
+    return true
+  else
+    return false
+  end
+end
 
 def play_a_round(round)
   keep_going = true
@@ -97,23 +155,27 @@ def play_a_round(round)
     round.display
     puts ""
     c = gets.downcase.chr
-    if was_picked(c, picked) == false
-      picked << c
-      correct = round.compare(c)
-      if correct == false
-        wrong += 1
+    if valid_entry(c)
+      if was_picked(c, picked) == false
+        picked << c
+        correct = round.compare(c)
+        if correct == false
+          wrong += 1
+        end
+        if wrong >= 8
+          puts "Hangman. Game Over."
+          keep_going = false
+        end
+        if round.check_for_win
+          keep_going = false
+          puts "You Win!"
+        end
+        count += 1
+      else
+        puts "You've already picked that letter."
       end
-      if wrong >= 8
-        puts "Hangman. Game Over."
-        keep_going = false
-      end
-      if round.check_for_win
-        keep_going = false
-        puts "You Win!"
-      end
-      count += 1
     else
-      puts "You've already picked that letter."
+      puts "#{c} is not a letter."
     end
   end
   puts ""
