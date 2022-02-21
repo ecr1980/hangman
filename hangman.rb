@@ -2,15 +2,19 @@ require "json"
 
 class PlayRound
 
-  def initialize(word)
-    @word = word.split("")
-    @game_board = Array.new(word.length, "_")
-    @count = 0
-    @wrong = 0
-    @picked = []
-    @man = Array.new(7, " ")
-    @hung_man = ["|", "O", "|", "/","\\", "/", "\\"]
-    puts "Iniitialized!"
+  def initialize(word, load_game)
+    if load_game == true
+      self.load
+    else
+      @word = word.split("")
+      @game_board = Array.new(word.length, "_")
+      @count = 0
+      @wrong = 0
+      @picked = []
+      @man = Array.new(7, " ")
+      @hung_man = ["|", "O", "|", "/","\\", "/", "\\"]
+      puts "Iniitialized!"
+    end
   end
 
   def compare(guess)
@@ -87,9 +91,25 @@ class PlayRound
   end
 
   def save
-    #save_data = {:word=>@word, :game_board=>@game_board, :count=>@count, :wrong=>@wrong :picked=>@picked,}.to_json
-    #file = File.open("save.txt","w")
+    save_data = {:word=>@word, :game_board=>@game_board, :wrong=>@wrong, :picked=>@picked, :count=>@count, :man=>@man}.to_json
+    file = File.open("save.txt","w")
+    file.puts save_data
+    file.close
   end
+
+  def load
+    file = File.open("save.txt", "r")
+    save_data = file.readline
+    save_data = JSON.parse(save_data).to_hash
+    @word = save_data["word"]
+    @game_board = save_data["game_board"]
+    @wrong = save_data["wrong"]
+    @picked = save_data["picked"]
+    @count = save_data["count"]
+    @man = save_data["man"]  
+    file.close
+  end
+
 end
 
 
@@ -194,11 +214,22 @@ def valid_entry(c)
   end
 end
 
+def load_game
+  valid_selection = false
+  while valid_selection == false
+    puts "Would you like to load the previous game?"
+    if gets.downcase.chr == "y"
+      valid_selection = true
+      return true
+    elsif gets.downcase.chr == "n"
+      valid_selection = true
+      return false
+    end
+  end
+end 
+
 def play_a_round(round)
   keep_going = true
-  wrong = 0
-  count = 0
-  picked = []
   while keep_going
     round.display
     c = gets.downcase.chr
@@ -224,9 +255,16 @@ def play_a_round(round)
 end
 
 def play()
-  choose_difficulty = get_difficulty()
-  word = get_word_array(choose_difficulty)
-  round = PlayRound.new(word)
+  if File.exist?("save.txt")
+    load_game = load_game()
+  end
+  if load_game == true
+    word = ""
+  else
+    choose_difficulty = get_difficulty()
+    word = get_word_array(choose_difficulty)
+  end
+  round = PlayRound.new(word, load_game)
   play_a_round(round)
     
 end
