@@ -2,7 +2,7 @@ require "json"
 
 class PlayRound
 
-  def initialize(word, load_game)
+  def initialize(word = "", load_game)
     @hung_man = ["|", "O", "|", "/","\\", "/", "\\"]
     if load_game == true
       self.load
@@ -259,9 +259,7 @@ def play()
     if File.exist?("save.txt")
       load_game = yes_or_no("Would you like to load a previous save?")
     end
-    if load_game == true
-      word = ""
-    else
+    if load_game != true
       choose_difficulty = get_difficulty()
       word = get_word_array(choose_difficulty)
     end
