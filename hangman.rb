@@ -1,24 +1,81 @@
+require "json"
+
 class PlayRound
 
   def initialize(word)
     @word = word.split("")
     @game_board = Array.new(word.length, "_")
+    @count = 0
+    @wrong = 0
+    @picked = []
+    @man = Array.new(7, " ")
+    @hung_man = ["|", "O", "|", "/","\\", "/", "\\"]
     puts "Iniitialized!"
   end
 
   def compare(guess)
-    @correct = false
+    correct = false
     @word.each_with_index do |letter, i|
       if letter == guess
         @game_board[i] = "#{guess}"
-        @correct = true
+        correct = true
       end
     end
-    @correct
+    correct
+  end
+
+  def display_hangman
+    puts ""
+    puts "  ___________"
+    puts "  #{@man[0]}         |"
+    puts "  #{@man[1]}         |"
+    puts " #{@man[3]}#{@man[2]}#{@man[4]}        |"
+    puts " #{@man[5]} #{@man[6]}        |"
+    puts "            |"
+    puts "  __________| "
+    puts ""
   end
 
   def display
+    puts "Enter a letter, or ! to save and quit."
+    if @count > 0
+      puts "Chosen letters are:"
+      puts ""
+      puts "#{@picked.sort!.join(" ").to_s}"
+    end
+    self.display_hangman
     puts @game_board.join.to_s
+    puts ""
+  end
+
+  def check_if_picked(c)
+    was_picked = false
+    @picked.each do |letter|
+      if letter == c
+        was_picked = true
+      end
+    end
+    return was_picked
+  end
+
+  def was_not_picked(c)
+    @count += 1
+    @picked << c
+    was_correct = self.compare(c)
+    if was_correct == false
+      @man[@wrong] = @hung_man[@wrong]
+      @wrong += 1
+    end
+    if @wrong >= 7
+      self.display_hangman
+      puts "Hangman. Game Over."
+      puts @word.join.to_s
+      return false
+    end
+    if self.check_for_win
+      puts "You Win!"
+      return false
+    end
   end
 
   def check_for_win
@@ -27,6 +84,11 @@ class PlayRound
     else
       return false
     end
+  end
+
+  def save
+    #save_data = {:word=>@word, :game_board=>@game_board, :count=>@count, :wrong=>@wrong :picked=>@picked,}.to_json
+    #file = File.open("save.txt","w")
   end
 end
 
@@ -70,7 +132,7 @@ def difficulty_choice(difficulty)
   choice_array
 end
 
-def was_picked(c, picked)
+def was_not_picked(c,picked)
   was_picked = false
   picked.each do |letter|
     if letter == c
@@ -134,6 +196,8 @@ def valid_entry(c)
     return true
   when "z"
     return true
+  when "!"
+    return true
   else
     return false
   end
@@ -145,32 +209,19 @@ def play_a_round(round)
   count = 0
   picked = []
   while keep_going
-    puts "Enter a letter"
-    if count > 0
-      puts "Chosen letters are:"
-      puts ""
-      puts "#{picked.sort!.join(" ").to_s}"
-    end
-    puts ""
     round.display
-    puts ""
     c = gets.downcase.chr
     if valid_entry(c)
-      if was_picked(c, picked) == false
-        picked << c
-        correct = round.compare(c)
-        if correct == false
-          wrong += 1
-        end
-        if wrong >= 8
-          puts "Hangman. Game Over."
+      if c == "!"
+        puts "Save and quit?"
+        if gets.chr.downcase == "y"
+          round.save
+          break
+        end      
+      elsif round.check_if_picked(c) == false
+        if round.was_not_picked(c) == false
           keep_going = false
         end
-        if round.check_for_win
-          keep_going = false
-          puts "You Win!"
-        end
-        count += 1
       else
         puts "You've already picked that letter."
       end
