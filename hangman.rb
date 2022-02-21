@@ -213,17 +213,16 @@ def valid_entry(c)
   end
 end
 
-def load_game
-  valid_selection = false
-  while valid_selection == false
-    puts "Would you like to load the previous game?"
+def yes_or_no(text)
+  while true
+    puts text
     choice = gets.downcase.chr
     if choice == "y"
-      valid_selection = true
       return true
     elsif choice == "n"
-      valid_selection = false
       return false
+    else 
+      puts "Please answer yes or no."
     end
   end
 end 
@@ -255,18 +254,22 @@ def play_a_round(round)
 end
 
 def play()
-  if File.exist?("save.txt")
-    load_game = load_game()
-  end
-  if load_game == true
-    word = ""
-  else
-    choose_difficulty = get_difficulty()
-    word = get_word_array(choose_difficulty)
-  end
-  round = PlayRound.new(word, load_game)
-  play_a_round(round)
-    
+  keep_going = true
+  while keep_going == true
+    if File.exist?("save.txt")
+      load_game = yes_or_no("Would you like to load a previous save?")
+    end
+    if load_game == true
+      word = ""
+    else
+      choose_difficulty = get_difficulty()
+      word = get_word_array(choose_difficulty)
+    end
+    round = PlayRound.new(word, load_game)
+    play_a_round(round)
+    keep_going = yes_or_no("Would you like to play again?")
+  end    
+  puts "Thank you for playing!"
 end
 
 play()
